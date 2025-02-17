@@ -1,7 +1,23 @@
+const enum TIPO {
+  SCOOTER = "scooter",
+  BICI = "bici",
+  MONOPATTINO = "monopattino",
+}
+
+const enum STATOMEZZO {
+  OCCUPATO = "occupato",
+  LIBERO = "libero",
+}
+
+const enum PAGAMENTO {
+  CARTA = "carta",
+  CONTANTI = "contanti",
+}
+
 interface IMezzo {
-  tipo: "bici" | "scooter" | "monopattino";
+  tipo: TIPO;
   id: string;
-  stato: "libero" | "occupato";
+  stato: STATOMEZZO;
 
   assegnaUtente(utente: IUtente): void;
   generaID(): string;
@@ -11,7 +27,7 @@ interface IUtente {
   nome: string;
   cognome: string;
   mail: string;
-  metodoPagamento: "Carta" | "Contanti";
+  metodoPagamento: PAGAMENTO;
 
   prenotaMezzo(mezzo: IMezzo): void;
 }
@@ -25,17 +41,32 @@ interface ICitta {
 
 class Mezzo implements IMezzo {
   occupante: IUtente;
-  tipo: "bici" | "scooter" | "monopattino";
+  tipo: TIPO;
   id: string;
-  stato: "libero" | "occupato";
-  constructor(tipo: "bici" | "scooter" | "monopattino") {
-    this.tipo = tipo;
+  stato: STATOMEZZO;
+
+  constructor(tipo: string) {
     this.id = this.generaID();
-    this.stato = "libero";
+    this.stato = STATOMEZZO.LIBERO;
+    //Controllo validità tipo mezzo
+    switch (tipo.toLowerCase()) {
+      case TIPO.BICI:
+        this.tipo = TIPO.BICI;
+        break;
+      case TIPO.MONOPATTINO:
+        this.tipo = TIPO.MONOPATTINO;
+        break;
+      case TIPO.SCOOTER:
+        this.tipo = TIPO.SCOOTER;
+        break;
+
+      default:
+        throw new Error("Il mezzo che stai cercando non è valido");
+    }
   }
 
   assegnaUtente(utente: IUtente): void {
-    this.stato = "occupato";
+    this.stato = STATOMEZZO.OCCUPATO;
     this.occupante = utente;
   }
   generaID(): string {
@@ -54,21 +85,33 @@ class Utente implements IUtente {
   nome: string;
   cognome: string;
   mail: string;
-  metodoPagamento: "Carta" | "Contanti";
+  metodoPagamento: PAGAMENTO;
   constructor(
     nome: string,
     cognome: string,
     mail: string,
-    metodoPagamento: "Carta" | "Contanti"
+    metodoPagamento: string
   ) {
     this.nome = nome;
     this.cognome = cognome;
     this.mail = mail;
-    this.metodoPagamento = metodoPagamento;
+
+    //Controllo validità metodo pagamento
+    switch (metodoPagamento.toLowerCase()) {
+      case PAGAMENTO.CARTA:
+        this.metodoPagamento = PAGAMENTO.CARTA;
+        break;
+      case PAGAMENTO.CONTANTI:
+        this.metodoPagamento = PAGAMENTO.CONTANTI;
+        break;
+
+      default:
+        throw new Error("Questo tipo di pagamento non è disponibile");
+    }
   }
   prenotaMezzo(mezzo: IMezzo): void {
     // Controllo stato mezzo richiesto, se occupato comunica la non disponibilità del mezzo
-    if (mezzo.stato !== "libero") {
+    if (mezzo.stato !== STATOMEZZO.LIBERO) {
       console.log(
         `Il mezzo che hai richiesto (ID: ${mezzo.id}) è già occupato, cercane un altro!`
       );
@@ -96,19 +139,19 @@ class Citta implements ICitta {
 
 // Istanze mezzi
 let mezzo1 = new Mezzo("bici");
-let mezzo2 = new Mezzo("monopattino");
-let mezzo3 = new Mezzo("scooter");
+let mezzo2 = new Mezzo("MONOPATTINO");
+let mezzo3 = new Mezzo("Scooter");
 let mezzo4 = new Mezzo("scooter");
 
 // Istanze utenti
-let user1 = new Utente("Marco", "Rossi", "ciaociao@gmail.com", "Carta");
+let user1 = new Utente("Marco", "Rossi", "ciaociao@gmail.com", "CONTANTI");
 let user2 = new Utente(
   "Giulia",
   "Maccardini",
   "giulysium@gmail.com",
   "Contanti"
 );
-let user3 = new Utente("Teodoro", "Arnaldi", "arnaldoro@gmail.com", "Carta");
+let user3 = new Utente("Teodoro", "Arnaldi", "arnaldoro@gmail.com", "CONTANTI");
 
 // Istanze città
 let city1 = new Citta("Milano");
